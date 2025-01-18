@@ -96,4 +96,4 @@ private:
         LOG_BASE(3, format, ##__VA_ARGS__) \
     } while (0);
 
-#endif
+#endif // LOG_H
