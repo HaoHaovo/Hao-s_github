@@ -64,6 +64,29 @@ void HeapTimer::del_(size_t index)
     ref_.erase(heap_.back().id);
     heap_.pop_back();
 }
+void HeapTimer::add(int id, int timeOut, const TimeoutCallBack &cb)
+{
+    assert(id >= 0);
+    // 如果有，则调整
+    if (ref_.count(id))
+    {
+        int tmp = ref_[id];
+        heap_[tmp].expires = Clock::now() + MS(timeOut);
+        heap_[tmp].cb = cb;
+        if (!siftdown_(tmp, heap_.size()))
+        {
+            siftup_(tmp);
+        }
+    }
+    else
+    {
+        size_t n = heap_.size();
+        ref_[id] = n;
+        // 这里应该算是结构体的默认构造？
+        heap_.push_back({id, Clock::now() + MS(timeOut), cb}); // 右值
+        siftup_(n);
+    }
+}
 void HeapTimer::adjust(int id, int newExpires)
 {
     assert(!heap_.empty() && ref_.count(id));
